@@ -9,4 +9,4 @@ The operands used in this app, are:
 '~' for negation,
 '>' for imply,
 '<>' for if only if,
-'<X>' for XOR
+'<+X+>' for XOR (without plus sign)
