@@ -10,3 +10,6 @@ The operands used in this app, are:
 '>' for imply,
 '<>' for if only if,
 '<+X+>' for XOR (without plus sign)
+
+
+version 2: dynamic variables and truth table
