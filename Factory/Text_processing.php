@@ -14,32 +14,40 @@ class Text_processing
         $this->array_left = str_split($left);
         $count1 = $this->count_of_proposition($this->array_left);
         $left_count = $count1['prop'];
-        $variable_left = [$count1['p'],$count1['q'],$count1['r']];
+        $variable_left = $count1['alphabet'];
+        // echo "</br> var left: </br>";
+        // var_dump($variable_left);
         
         //count right
         $this->array_right = str_split($right);
         $count2 = $this->count_of_proposition($this->array_right);
         $right_count = $count2['prop'];
-        $variable_right = [$count2['p'],$count2['q'],$count2['r']];
+        $variable_right = $count2['alphabet'];
+        // echo "</br> var right: </br>";
+        // var_dump($variable_right);
 
         $valid_variable = true;
         if($left_count > $right_count){
             $i=0;
             foreach($variable_right as $var){
-                if($var > 0){
-                    if($variable_left[$i] == 0){
-                        $valid_variable = false;
-                    }
+                if(array_search($var,$variable_left) === false)
+                {
+                    $valid_variable = false;
+                    break;
+                }else{
+                    $valid_variable = true;
                 }
                 $i++;
             }
         }else{
             $i=0;
             foreach($variable_left as $var){
-                if($var > 0){
-                    if($variable_right[$i] == 0){
-                        $valid_variable = false;
-                    }
+                if(array_search($var,$variable_right) === false)
+                {
+                    $valid_variable = false;
+                    break;
+                }else{
+                    $valid_variable = true;
                 }
                 $i++;
             }
@@ -63,60 +71,117 @@ class Text_processing
     //count the variation of prop
     private function count_of_proposition($array_text)
     {
-        $count_p = 0; 
-        $count_q = 0; 
-        $count_r = 0;
-        $count_prop = 0;
+        //list of characters that will be recognized as proposition
+        // $alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
 
-        foreach($array_text as $char)
-        {
-            if(strtoupper($char) === "P")
+        //ARRAY BOWL FOR REMEMBERING PICKED ALPAHBET
+        $alphabet_count = [ "A"=> 0,
+                            "B"=> 0,
+                            "C"=> 0,
+                            "D"=> 0,
+                            "E"=> 0,
+                            "F"=> 0,
+                            "G"=> 0,
+                            "H"=> 0,
+                            "I"=> 0,
+                            "J"=> 0,
+                            "K"=> 0,
+                            "L"=> 0,
+                            "M"=> 0,
+                            "N"=> 0,
+                            "O"=> 0,
+                            "P"=> 0,
+                            "Q"=> 0,
+                            "R"=> 0,
+                            "S"=> 0,
+                            "T"=> 0,
+                            "U"=> 0,
+                            "W"=> 0,
+                            "Y"=> 0,
+                            "Z"=> 0];
+        $alphabet = array_keys($alphabet_count);
+        $operand = ["V", "^", ">", "<>", "<X>", "~","(",")"];
+        // $count_p = 0; 
+        // $count_q = 0; 
+        // $count_r = 0;
+        $count_prop = 0;
+        $prop_that_used = [];
+
+        $i = 0;
+
+        while($i < sizeof($array_text)){
+            if(array_search(strtoupper($array_text[$i]),$alphabet) === false)
             {
-                $count_p++;
-            }else if(strtoupper($char) === "Q")
-            {
-                $count_q++;
-            }else if(strtoupper($char) === "R")
-            {
-                $count_r++;
+            }else{
+                // echo "check char: " .$array_text[$i] . "</br>"; 
+                $temp = $alphabet_count[$array_text[$i]] + 1;
+                $alphabet_count[$array_text[$i]] = $temp;
+            }
+            $i++;
+        }
+
+        foreach($alphabet as $alp){
+            if(($alphabet_count[$alp]) > 0){
+                $count_prop++;
+                array_push($prop_that_used,$alp);
             }
         }
-        if($count_p >0){
-            $count_prop++;
-        }
-        if($count_q >0){
-            $count_prop++;
-        }
-        if($count_r >0){
-            $count_prop++;
-        }
 
-        return ['prop' => $count_prop, 'p' => $count_p, 'q' => $count_q, 'r' => $count_r,];
+        // foreach($array_text as $char)
+        // {
+        //     if(strtoupper($char) === "P")
+        //     {
+        //         $count_p++;
+        //     }else if(strtoupper($char) === "Q")
+        //     {
+        //         $count_q++;
+        //     }else if(strtoupper($char) === "R")
+        //     {
+        //         $count_r++;
+        //     }
+        // }
+        // if($count_p >0){
+        //     $count_prop++;
+        // }
+        // if($count_q >0){
+        //     $count_prop++;
+        // }
+        // if($count_r >0){
+        //     $count_prop++;
+        // }
+
+        return ['prop' => $count_prop, 'alphabet' => $prop_that_used];
     }
 
     //replace proposition with truth table
-    public function replace_proposition($count, $truth_table, $array_to_proceed)
+    public function replace_proposition($count, $truth_table, $array_to_proceed, $variables)
     {
         //empty bowl for returning value
         $array_text = $array_to_proceed;
         
+        //uppercase
         $i=0;
         while($i < sizeof($array_text)){
             $array_text[$i] = strtoupper($array_text[$i]);
             $i++;
         }
 
-        $pqr = [];
-
-        //is it left or right side? determine the array text
-        /* if($flag == "left")
+        //dynamic variables operation
+        $i= 0;
+        foreach($array_text as $char)
         {
-            $array_text = $this->array_left;
-        }else{
-            $array_text = $this->array_right;
-        } */
+            if(array_search($char, $variables) === false)
+            {
+            }else{
+                $temp = array_search($char, $variables);
+                $array_text[$i] = $truth_table[$temp];
+            }
+            $i++;
+        }
 
-        //if count is two then the possible props are p, q, or r. we need to make sure what are those
+        return $array_text;
+
+        /* //if count is two then the possible props are p, q, or r. we need to make sure what are those
         if($count === 1)
         {
             $pos_p = array_search("P",$array_text);
@@ -220,13 +285,8 @@ class Text_processing
                 $i++;
             }
 
-            //collecting variabel that used in sentences
-            array_push($pqr, $string1);
-            array_push($pqr, $string2);
-            array_push($pqr, $string3);
-
             return $array_text;
-        }
+        } */
     }
 
     //scrapping text to determine role of playing
@@ -258,6 +318,8 @@ class Text_processing
         // echo var_dump($array_to_track) . "</br>";
 
         //checking if $array_to_track is multiple values or single value
+        // echo  "</br>";
+        // var_dump($array_to_track);
         if(is_array($array_to_track)){
             if((sizeof($array_to_track) === 1)){
                 if($array_to_track[0] == "T"){
@@ -265,6 +327,7 @@ class Text_processing
                 }else if($array_to_track[0] == "F"){
                     return FALSE;
                 }else{
+                    // echo "Oh God atas </br>";
                     return "Oh God";
                 }
             }
@@ -274,6 +337,7 @@ class Text_processing
             }else if($array_to_track == "F"){
                 return FALSE;
             }else{
+                // echo "Oh God bawah </br>";
                 return "Oh God";
             }
         }
@@ -313,10 +377,12 @@ class Text_processing
             }else if(($char == "V") or ($char == "^") or ($char == ">") or ($char == "<") or ($char == "X"))
             {
                 //in case found <> then jump 2 indexes
-                if(($char == ">") AND ($array_to_track[$idx-1] == "<")){
+                if(($char == ">") AND (($array_to_track[$idx-1] == "<") OR ($array_to_track[$idx-1] == "X"))){
                 }else{
                     $temp_cond = $temp_cond . "ope+";
                 }
+            }else{
+                return "Oh God";
             }
 
             //  echo "temp_cond ".$temp_cond. "</br>";

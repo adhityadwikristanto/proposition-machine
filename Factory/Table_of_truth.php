@@ -3,34 +3,87 @@ namespace App\Http\Factory;
 
 class Table_of_truth
 {
-    public function get_combination_p()
-    {
-        return [
-            ["F","T"],
-        ];
-    }
-    public function get_combination_pq()
-    {
-        return [
-            ["F","F"],
-            ["T","F"],
-            ["F","T"],
-            ["T","T"],
-        ];
-    }
+    // public function get_combination_p()
+    // {
+    //     return [
+    //         ["F","T"],
+    //     ];
+    // }
+    // public function get_combination_pq()
+    // {
+    //     return [
+    //         ["F","F"],
+    //         ["T","F"],
+    //         ["F","T"],
+    //         ["T","T"],
+    //     ];
+    // }
 
-    public function get_combination_pqr()
+    // public function get_combination_pqr()
+    // {
+    //     return [
+    //         ["F","T","T"],
+    //         ["F","T","F"],
+    //         ["F","F","T"],
+    //         ["F","F","F"],
+    //         ["T","T","T"],
+    //         ["T","T","F"],
+    //         ["T","F","T"],
+    //         ["T","F","F"],
+    //     ];
+    // }
+
+    public function get_combination($max_count)
     {
-        return [
-            ["F","T","T"],
-            ["F","T","F"],
-            ["F","F","T"],
-            ["F","F","F"],
-            ["T","T","T"],
-            ["T","T","F"],
-            ["T","F","T"],
-            ["T","F","F"],
-        ];
+        $total = 2**$max_count;
+
+        //looping variable
+        $loop = 0;
+        $multiple = 0;
+
+        //empty bowl
+        $bowl_truth_table = [];
+        
+        while($loop < $max_count)
+        {
+            $temp_array = [];
+            $loop2 = 0;
+            $temp_truth = "F";
+            $multiple = 2**$loop;
+            while($loop2 < $total){
+                $loop3 = 0;
+                while($loop3 < $multiple)
+                {
+                    array_push($temp_array, $temp_truth);
+                    $loop3++;
+                }
+                if($temp_truth == "F")
+                {
+                    $temp_truth = "T";
+                }else{
+                    $temp_truth = "F";
+                }
+                $loop2 = $loop2 + $multiple;
+            }
+            array_push($bowl_truth_table, $temp_array);
+            $loop++;
+        }
+
+        //transpose the result
+        $truth_table = [];
+        $loop = 0;
+        while($loop < $total)
+        {
+            $loop2=0;
+            while($loop2 < $max_count)
+            {
+                $truth_table[$loop][$loop2] = $bowl_truth_table[$loop2][$loop];
+                $loop2++;
+            }
+            $loop++;
+        }
+
+        return $truth_table;
     }
 
     public function test_operation($prop1, $operator, $prop2)
@@ -83,7 +136,7 @@ class Table_of_truth
                 $result = false;
             }
 
-        }else if($operator == "X")
+        }else if($operator == "<X>")
         {
             //xor
             $result = $left XOR $right;
